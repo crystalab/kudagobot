@@ -10,10 +10,18 @@ SEARCH_RADIUS_IN_METERS = 2500
 
 def on_start(update, context):
     keyboard = [
-        [InlineKeyboardButton("Рестораны", callback_data='restaurants'),
-         InlineKeyboardButton("Клубы", callback_data='clubs')],
-        [InlineKeyboardButton("Кино", callback_data='cinema'), InlineKeyboardButton("Парки", callback_data='park')],
-        [InlineKeyboardButton("Бары", callback_data='bar'), InlineKeyboardButton("Театры", callback_data='theatre')]
+        [
+            InlineKeyboardButton("Рестораны", callback_data='restaurants'),
+            InlineKeyboardButton("Клубы", callback_data='clubs')
+        ],
+        [
+            InlineKeyboardButton("Кино", callback_data='cinema'),
+            InlineKeyboardButton("Парки", callback_data='park')
+        ],
+        [
+            InlineKeyboardButton("Бары", callback_data='bar'),
+            InlineKeyboardButton("Театры", callback_data='theatre')
+        ]
     ]
 
     context.bot.send_message(chat_id=update.effective_chat.id,
@@ -34,7 +42,7 @@ def on_place_chosen(update, context):
     query.answer()
 
     place_id = query.data
-    response = requests.get(f'https://kudago.com/public-api/v1.4/places/{place_id}/')
+    response = requests.get(f'https://kudago.com/public-api/v1.4/places/{place_id}/?lang=en')
     data = response.json()
 
     title = data['title']
@@ -60,7 +68,8 @@ def on_location(update, context):
               'page_size': 5,
               'categories': context.user_data['place_type'],
               'lon': context.user_data['lon'],
-              'lat': context.user_data['lat']}
+              'lat': context.user_data['lat'],
+              'lang': 'en'}
 
     response = requests.get('https://kudago.com/public-api/v1.4/places/', params=params)
     data = response.json()
@@ -69,6 +78,11 @@ def on_location(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text='Я не смог ничего найти, попробуйте другой адрес')
         return
+
+    # l = [[Button, Button, Button],
+    #      [Button, Button, Button],
+    #      [Button, Button, Button]]
+    # l[row][col]
 
     keyboard = []
     for result in data['results']:
